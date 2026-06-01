@@ -24,8 +24,6 @@ from datetime import datetime
 from io import BytesIO
 from typing import Dict, List, Tuple
 
-from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
