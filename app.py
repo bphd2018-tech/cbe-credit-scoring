@@ -249,7 +249,7 @@ def render_login():
         with st.form("login_form"):
             username = st.text_input("👤 Username", placeholder="Enter your username")
             password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
-            submitted = st.form_submit_button("🔐 LOGIN", use_container_width=True)
+            submitted = st.form_submit_button("🔐 LOGIN", width='stretch')
             if submitted:
                 ok, role, full_name = authenticate(username.strip(), password)
                 if ok:
@@ -261,7 +261,7 @@ def render_login():
                 else:
                     st.error("Invalid username or password, or the user is inactive.")
         #st.caption("Demo credentials: admin/admin123, tigist/tigist123, surafel/surafel123")
-       # if st.button("🔄 Reset Demo Users", use_container_width=True):
+       # if st.button("🔄 Reset Demo Users", width='stretch'):
         #    save_user_db(default_users())
          #   st.success("Demo users reset. Now log in using admin/admin123, tigist/tigist123, or surafel/surafel123.")
           #  st.rerun()
@@ -409,14 +409,14 @@ def plot_bar(data: pd.DataFrame, x: str, y: str, title: str, ylabel: str = ""):
     ax.tick_params(axis="x", rotation=25, labelsize=8)
     ax.tick_params(axis="y", labelsize=8)
     ax.grid(axis="y", alpha=0.25)
-    st.pyplot(fig, clear_figure=True, use_container_width=True)
+    st.pyplot(fig, clear_figure=True, width='stretch')
 
 
 def plot_pie(labels, values, title: str):
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
     ax.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, textprops={"fontsize": 8})
     ax.set_title(title, fontsize=11, fontweight="bold")
-    st.pyplot(fig, clear_figure=True, use_container_width=True)
+    st.pyplot(fig, clear_figure=True, width='stretch')
 
 
 def prepare_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series, List[str], List[str]]:
@@ -607,7 +607,7 @@ full_name = st.session_state.get("full_name", username)
 allowed_pages = user_db.get("role_pages", {}).get(role, DEFAULT_ROLE_PAGES.get(role, []))
 
 st.sidebar.success(f"✅ {full_name}\n\nRole: {role}")
-if st.sidebar.button("🚪 Logout", use_container_width=True):
+if st.sidebar.button("🚪 Logout", width='stretch'):
     st.session_state.logged_in = False
     st.session_state.username = None
     st.session_state.role = None
@@ -702,7 +702,7 @@ if section == "👥 Admin User & GUI Management":
             {"username": u, "full_name": v.get("full_name"), "role": v.get("role"), "active": v.get("active", True)}
             for u, v in db["users"].items()
         ])
-        st.dataframe(users_df, use_container_width=True)
+        st.dataframe(users_df, width='stretch')
         selected_user = st.selectbox("Select user to update", users_df["username"].tolist())
         if selected_user:
             c1, c2, c3 = st.columns(3)
@@ -756,7 +756,7 @@ elif section == "🏦 Loan Officer Dashboard":
     with tabs[0]:
         if "borrower_type" in filtered_df.columns:
             plot_bar(group_summary(filtered_df, "borrower_type"), "borrower_type", "total_loans", "Loans by Borrower Type", "Count")
-        st.dataframe(filtered_df.head(50), use_container_width=True)
+        st.dataframe(filtered_df.head(50), width='stretch')
     with tabs[1]:
         for col in ["loan_intent", "income_level", "loan_amount_level", "previous_loan_defaults_on_file"]:
             if col in filtered_df.columns:
@@ -764,7 +764,7 @@ elif section == "🏦 Loan Officer Dashboard":
     with tabs[2]:
         cols = [c for c in ["borrower_type", "loan_intent", "income_level", "loan_amount_level", "education_or_company_size"] if c in filtered_df.columns]
         selected_segment = st.selectbox("Select segment", cols)
-        st.dataframe(group_summary(filtered_df, selected_segment), use_container_width=True)
+        st.dataframe(group_summary(filtered_df, selected_segment), width='stretch')
     close_card()
 
 # -----------------------------------------------------------------------------
@@ -782,7 +782,7 @@ elif section == "📦 Bulk Credit Scoring":
         st.write("Best option: upload the same columns as the loan dataset, without needing loan_status. For existing customers, a CSV with only customer_id also works.")
         if ID_COL in df_raw.columns:
             sample_template = pd.DataFrame({ID_COL: df_raw[ID_COL].astype(str).head(5).tolist()})
-            st.dataframe(sample_template, use_container_width=True)
+            st.dataframe(sample_template, width='stretch')
             st.download_button("⬇️ Download simple customer_id template", sample_template.to_csv(index=False).encode("utf-8"), "bulk_customer_id_template.csv", "text/csv")
 
     bulk_file = st.file_uploader("Upload bulk customer/application CSV", type=["csv"], key="bulk_upload")
@@ -791,9 +791,9 @@ elif section == "📦 Bulk Credit Scoring":
         try:
             bulk_df = normalize_columns(pd.read_csv(bulk_file))
             st.subheader("Uploaded CSV Preview")
-            st.dataframe(bulk_df.head(20), use_container_width=True)
+            st.dataframe(bulk_df.head(20), width='stretch')
 
-            if st.button("🚀 Run Bulk Credit Scoring", use_container_width=True):
+            if st.button("🚀 Run Bulk Credit Scoring", width='stretch'):
                 if bulk_df.empty:
                     st.error("The uploaded CSV is empty.")
                 else:
@@ -812,7 +812,7 @@ elif section == "📦 Bulk Credit Scoring":
                 c3.metric("Predicted Bad/NPL", f"{int((scored['predicted_loan_status']==1).sum()):,}")
                 c4.metric("No Data / New", f"{int(scored['predicted_loan_status'].isna().sum()):,}")
                 plot_pie(scored["predicted_credit_grade"].value_counts().index, scored["predicted_credit_grade"].value_counts().values, "Bulk Scoring Result Mix")
-                st.dataframe(scored, use_container_width=True)
+                st.dataframe(scored, width='stretch')
                 st.download_button("⬇️ Download Bulk Scoring Results CSV", scored.to_csv(index=False).encode("utf-8"), "bulk_credit_scoring_results.csv", "text/csv")
                 st.download_button("⬇️ Download Bulk Scoring Results Excel", make_excel_download({"Bulk Results": scored}), "bulk_credit_scoring_results.xlsx")
         except Exception as exc:
@@ -832,7 +832,7 @@ elif section == "🧮 Credit Scoring Calculator":
     if ID_COL in df_raw.columns:
         st.caption("Example customer IDs: " + ", ".join(df_raw[ID_COL].astype(str).head(5).tolist()))
     customer_id = st.text_input("Enter Customer ID", placeholder="Example: CUST00001")
-    if st.button("🔍 Check Customer Status", use_container_width=True):
+    if st.button("🔍 Check Customer Status", width='stretch'):
         if not customer_id.strip():
             st.warning("Please enter a Customer ID.")
         elif ID_COL not in df_raw.columns:
@@ -854,7 +854,7 @@ elif section == "🧮 Credit Scoring Calculator":
                     <div class="good-box"><h3>✅ CREDIT STATUS: GOOD</h3><p><b>This customer is predicted as low risk / Good Credit.</b></p><hr><p><b>Model Used:</b> {best_name}</p><p><b>Predicted Probability of Bad/NPL:</b> {proba:.2%}</p><p><b>Risk Assessment:</b> LOW RISK OF DEFAULT</p><ul><li>Proceed with the standard loan approval process</li><li>Consider competitive interest rates</li><li>Fast-track disbursement may be considered</li><li>Offer a higher loan amount for repeat customers, subject to policy</li><li>Consider loyalty benefits or reduced processing fees</li></ul></div>
                     """, unsafe_allow_html=True)
                 st.subheader("Customer Details")
-                st.dataframe(customer.to_frame("Value"), use_container_width=True)
+                st.dataframe(customer.to_frame("Value"), width='stretch')
     close_card()
 
 # -----------------------------------------------------------------------------
@@ -867,7 +867,7 @@ elif section == "📄 Loan Officer Report":
     report_tables = basic_report_tables(filtered_df, "Loan Officer Operational Report")
     for name, table in report_tables.items():
         st.subheader(name)
-        st.dataframe(table, use_container_width=True)
+        st.dataframe(table, width='stretch')
     st.download_button("⬇️ Download Loan Officer Report Excel", make_excel_download(report_tables), "loan_officer_report.xlsx")
     close_card()
 
@@ -896,7 +896,7 @@ elif section == "👔 Executive Dashboard":
         for col in ["borrower_type", "loan_intent", "income_level"]:
             if col in filtered_df.columns:
                 st.subheader(col.replace("_", " ").title())
-                st.dataframe(group_summary(filtered_df, col), use_container_width=True)
+                st.dataframe(group_summary(filtered_df, col), width='stretch')
     close_card()
 
 elif section == "📑 Executive Report":
@@ -915,7 +915,7 @@ elif section == "📑 Executive Report":
     }])
     for name, table in tables.items():
         st.subheader(name)
-        st.dataframe(table, use_container_width=True)
+        st.dataframe(table, width='stretch')
     st.download_button("⬇️ Download Executive Report Excel", make_excel_download(tables), "executive_credit_risk_report.xlsx")
     close_card()
 
@@ -931,9 +931,9 @@ elif section == "📋 Dataset Overview":
     c2.metric("Original Columns", f"{df_raw.shape[1]:,}")
     c3.metric("Missing Cells", f"{int(df_raw.isna().sum().sum()):,}")
     c4.metric("Duplicate Rows", f"{int(df_raw.duplicated().sum()):,}")
-    st.dataframe(df_raw.head(20), use_container_width=True)
+    st.dataframe(df_raw.head(20), width='stretch')
     col_info = pd.DataFrame({"Field Name": df_raw.columns, "Description": [FIELD_DESCRIPTIONS.get(c, "Custom / derived field") for c in df_raw.columns], "Data Type": [str(t) for t in df_raw.dtypes.values], "Missing Values": df_raw.isna().sum().values, "Unique Values": df_raw.nunique(dropna=False).values})
-    st.dataframe(col_info, use_container_width=True)
+    st.dataframe(col_info, width='stretch')
     close_card()
 
 elif section == "🔍 Exploratory Data Analysis":
@@ -951,13 +951,13 @@ elif section == "🔍 Exploratory Data Analysis":
             ax.hist(df.loc[df[TARGET] == status, selected_num].dropna(), bins=35, alpha=0.62, label=label)
         ax.set_title(f"Distribution of {selected_num} by Loan Status", fontweight="bold")
         ax.legend(); ax.grid(axis="y", alpha=0.25)
-        st.pyplot(fig, clear_figure=True, use_container_width=True)
+        st.pyplot(fig, clear_figure=True, width='stretch')
     with tabs[2]:
         cat_features = [c for c in ["borrower_type", "gender_or_company_entity_type", "education_or_company_size", "home_ownership_or_business_premises", "loan_intent", "previous_loan_defaults_on_file", "income_level", "loan_amount_level"] if c in df.columns]
         selected_cat = st.selectbox("Choose categorical feature", cat_features)
         data = group_summary(df, selected_cat)
         plot_bar(data, selected_cat, "npl_rate_pct", f"NPL Rate by {selected_cat.replace('_',' ').title()}", "NPL Rate (%)")
-        st.dataframe(data, use_container_width=True)
+        st.dataframe(data, width='stretch')
     with tabs[3]:
         numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
         corr = df[numeric_cols].corr(numeric_only=True)
@@ -967,7 +967,7 @@ elif section == "🔍 Exploratory Data Analysis":
         ax.set_yticks(range(len(corr.index))); ax.set_yticklabels(corr.index)
         ax.set_title("Numerical Feature Correlation Heatmap", fontweight="bold")
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-        st.pyplot(fig, clear_figure=True, use_container_width=True)
+        st.pyplot(fig, clear_figure=True, width='stretch')
     close_card()
 
 elif section == "⚙️ Model Training & Evaluation":
@@ -978,7 +978,7 @@ elif section == "⚙️ Model Training & Evaluation":
         results, best_name, feature_cols = train_models_cached(df)
     res_df = pd.DataFrame([{ "Model": name, "CV F1 Mean": round(r["cv_f1_mean"], 4), "CV F1 Std": round(r["cv_f1_std"], 4), "Accuracy": round(r["accuracy"], 4), "Precision": round(r["precision"], 4), "Recall": round(r["recall"], 4), "F1 Score": round(r["f1"], 4), "AUC ROC": round(r["auc"], 4)} for name, r in results.items()]).sort_values("F1 Score", ascending=False)
     st.success(f"🏆 Best model based on F1-score: {best_name}")
-    st.dataframe(res_df, use_container_width=True)
+    st.dataframe(res_df, width='stretch')
     plot_bar(res_df, "Model", "F1 Score", "Model F1 Score Comparison", "F1 Score")
     close_card()
 
@@ -1002,12 +1002,12 @@ elif section == "🎯 Best Model Results":
     ax.set_xticks([0,1]); ax.set_yticks([0,1]); ax.set_xticklabels(["Good", "Bad/NPL"]); ax.set_yticklabels(["Good", "Bad/NPL"])
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]): ax.text(j, i, str(cm[i,j]), ha="center", va="center", fontsize=16, fontweight="bold")
-    st.pyplot(fig, clear_figure=True, use_container_width=True)
+    st.pyplot(fig, clear_figure=True, width='stretch')
     imp = feature_importance_table(best_pipeline, feature_cols)
     if not imp.empty:
         plot_bar(imp.sort_values("importance"), "feature", "importance", "Top Model Drivers", "Importance")
     report = classification_report(r["y_test"], r["y_pred"], target_names=["Good / Performing", "Bad / NPL"], output_dict=True, zero_division=0)
-    st.dataframe(pd.DataFrame(report).T, use_container_width=True)
+    st.dataframe(pd.DataFrame(report).T, width='stretch')
     close_card()
 
 st.markdown('<p style="text-align:center; color:#FFFFFF; font-weight:700;">© 2026 Commercial Bank of Ethiopia | Role-Based AI Credit Scoring Prototype | For demonstration and research purposes</p>', unsafe_allow_html=True)
